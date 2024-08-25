@@ -56,7 +56,7 @@
       </div>
     </div>
     <!-- 底部button -->
-    <button class="next-button" v-show="isGameWin" @click="nextGame">下一关</button>
+    <button class="next-button" v-show="isGameWin">下一关</button>
 
     <!-- <div>
       <div class="operator-div" @click="handleClick">+</div>
@@ -74,7 +74,6 @@ import { useLightStore } from '@/stores/index'
 import { storeToRefs } from 'pinia'
 import { GlobalColor } from '@/stores/Color'
 import { playPreviewMusic } from '@/lib/Audio'
-import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   props: {
@@ -84,7 +83,6 @@ export default defineComponent({
     Panel
   },
   setup(props) {
-    const router = useRouter()
     // store
     const store = useLightStore()
     const { count } = storeToRefs(store)
@@ -174,10 +172,6 @@ export default defineComponent({
       }
     }
 
-    const nextGame = () => {
-      router.push({ name: 'game3' })
-    }
-
     onMounted(() => {
       setEnActive()
     })
@@ -185,8 +179,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       handleGo,
-      handleAdd,
-      nextGame
+      handleAdd
     }
   }
 })
