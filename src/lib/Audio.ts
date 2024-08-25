@@ -24,7 +24,7 @@ const audioArray = [
 
 const audioMap = {} as any
 for (let i = audioArray.length; i--; ) {
-  audioMap[audioArray[i]] = new Audio(`/audio/${audioArray[i]}.mp3`)
+  audioMap[audioArray[i]] = new Audio(`/joyowonder-games/dist/audio/${audioArray[i]}.mp3`)
 }
 
 // 如果发生音效选择事件，则播放对应音效

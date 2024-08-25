@@ -46,7 +46,6 @@ export const useLightStore = defineStore('light', {
   },
   actions: {
     increment() {
-      console.log('increment')
       this.count++
     },
     //
@@ -65,7 +64,6 @@ export const useLightStore = defineStore('light', {
         this.lightArr = [0, 0, 0, 0, 0, 0, 0, 0]
         this.lightArr[this.moveIndex] = GlobalColor.YELLOW
         this.moveIndex = this.moveIndex < 7 ? this.moveIndex + 1 : 0
-        console.log(JSON.stringify(this.lightArr))
       }, 500)
     },
     // 清除所有灯
@@ -82,7 +80,6 @@ export const useLightStore = defineStore('light', {
         for (let i = 0; i < 8; i++) {
           this.lightArr[i] = processColorString(this.lightArr[i], this.breathOpacity)
         }
-        console.log(JSON.stringify(this.lightArr))
         this.breathOpacity = this.breathOpacity + this.breathFactor * 0.1
         if (this.breathOpacity < 0) {
           this.breathOpacity = 0.1
@@ -117,7 +114,6 @@ export const useLightStore = defineStore('light', {
     setAllLights(color: string) {
       if (this.disable) return
       this.lightArr = [color, color, color, color, color, color, color, color]
-      console.log(JSON.stringify(this.lightArr))
     },
     // 游戏失败, 红色灯交替闪烁2次
     setGameFail() {

@@ -8,7 +8,7 @@ defineProps<{
   <div class="feedback">
     <h1>感谢您的体验！</h1>
     <p>请提供您的重要反馈。</p>
-    <img src="/code.png" alt="二维码" />
+    <img src="@/assets/code.png" alt="二维码" />
     <a href="your_feedback_link">填写反馈</a>
   </div>
 </template>
