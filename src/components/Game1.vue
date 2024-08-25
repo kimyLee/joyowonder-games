@@ -195,6 +195,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .game1 {
   position: relative;
+  user-select: none;
   .head-box {
     display: flex;
     align-items: center;

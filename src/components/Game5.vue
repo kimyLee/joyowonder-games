@@ -1,21 +1,21 @@
 <template>
-  <div class="game3">
+  <div class="game5">
     <Panel ref="joyo"></Panel>
     <div class="head-box">
       <div class="icon-go" @click="handleGo">GO!</div>
-      <div>NO: 03</div>
+      <div>NO: 05<br /><span class="small">必须使用'-'号</span></div>
     </div>
     <div class="game-container">
       <div class="game-box">
         <div class="number number1" @click="handleAdd(1)">1</div>
-        <div class="number number2" @click="handleAdd(1)">1</div>
-        <div class="number number3" @click="handleAdd(2)">2</div>
+        <div class="number number2" @click="handleAdd(2)">2</div>
+        <div class="number number3" @click="handleAdd(4)">4</div>
       </div>
     </div>
     <!-- 底部button -->
     <div class="controls">
-      <!-- <span class="button minus-sign">-</span> -->
-      <span class="button plus-sign" @click="handleAddOption()">+</span>
+      <span class="button minus-sign" @click="handleAddOption('-')">-</span>
+      <span class="button plus-sign" @click="handleAddOption('+')">+</span>
     </div>
     <button class="next-button" v-show="isGameWin" @click="nextGame">下一关</button>
 
@@ -71,7 +71,9 @@ export default defineComponent({
       rightCnt: 0,
       isGameWin: false,
       isGameStart: false,
-      isWaitOption: false
+      isWaitOption: false,
+      isUseReduce: false,
+      currentOption: '+'
     })
 
     // 点击GO逻辑， 2s后出题
@@ -93,11 +95,14 @@ export default defineComponent({
 
     // 出题逻辑
     const handleQuestion = () => {
+      const ans = [1, 2, 3, 5]
       state.sum = 0
+      state.currentOption = '+'
+      state.isUseReduce = false
       playPreviewMusic('question01')
       let random = 0
       while (random === state.result || random === 0) {
-        random = Math.floor(Math.random() * 2) + 2
+        random = ans[Math.floor(Math.random() * 4)]
       }
       // const random = Math.floor(Math.random() * 5) + 4
       setLightByNumber(random, GlobalColor.ORANGE)
@@ -106,8 +111,10 @@ export default defineComponent({
     }
 
     // 点击选项（累加，一旦超出，失败）
-    const handleAddOption = () => {
+    const handleAddOption = (option: string) => {
+      state.currentOption = option
       playPreviewMusic('common01')
+
       state.isWaitOption = false
     }
     const handleAdd = (num: number) => {
@@ -121,15 +128,25 @@ export default defineComponent({
       }
       playPreviewMusic('common01')
       state.isWaitOption = true
-      state.sum = state.sum + num
-      for (let i = 0; i < state.sum; i++) {
-        setSingleLight(i, GlobalColor.GREEN)
+      if (state.currentOption === '+') {
+        state.sum = state.sum + num
+      } else if (state.currentOption === '-') {
+        state.sum = state.sum - num
+        state.isUseReduce = true
       }
-      if (state.sum > state.result) {
+
+      // 先点目标灯，再点结果灯
+      handleShowLights()
+
+      // for (let i = 0; i < state.sum; i++) {
+      //   setSingleLight(i, GlobalColor.GREEN)
+      // }
+      // 这里数字过大不会失败，因为可以减法；考虑小于0要不要失败
+      if (state.sum < 0) {
         // 游戏失败
         setGameFail()
         playPreviewMusic('error')
-      } else if (state.sum === state.result) {
+      } else if (state.sum === state.result && state.isUseReduce) {
         // 如果已经2次成功，游戏胜利，否则再来一题
         if (state.rightCnt < 1) {
           state.rightCnt++
@@ -146,8 +163,19 @@ export default defineComponent({
       }
     }
 
+    const handleShowLights = () => {
+      clearAllLight()
+      // 先点目标灯，再点结果灯
+      for (let i = 0; i < state.result; i++) {
+        setSingleLight(i, GlobalColor.ORANGE)
+      }
+      for (let i = 0; i < state.sum; i++) {
+        setSingleLight(i, GlobalColor.GREEN)
+      }
+    }
+
     const nextGame = () => {
-      router.push({ name: 'game5' })
+      router.push({ name: 'feedback' })
     }
 
     onMounted(() => {
@@ -166,7 +194,7 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.game3 {
+.game5 {
   position: relative;
   user-select: none;
   .head-box {
@@ -186,6 +214,9 @@ export default defineComponent({
       border-radius: 50%;
       background-color: burlywood;
       margin-right: 10px;
+    }
+    .small {
+      font-size: 12px;
     }
   }
   .game-container {

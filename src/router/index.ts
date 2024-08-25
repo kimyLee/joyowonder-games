@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 import HomeView from '../views/HomeView.vue'
 import Game1 from '../components/Game1.vue'
 import Game3 from '../components/Game3.vue'
+import Game5 from '../components/Game5.vue'
 import FeedBack from '../components/FeedBack.vue'
 
 const router = createRouter({
@@ -22,10 +23,15 @@ const router = createRouter({
       name: 'game3',
       component: Game3
     },
+    {
+      path: '/game5',
+      name: 'game5',
+      component: Game5
+    },
     // 问卷二维码页
     {
       path: '/feedback',
-      name: 'feedBack',
+      name: 'feedback',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.

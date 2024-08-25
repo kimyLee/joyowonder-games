@@ -1,5 +1,5 @@
 <template>
-  <div class="game1">
+  <div class="game2">
     <Panel ref="joyo"></Panel>
     <div class="head-box">
       <div class="icon-go" @click="handleGo">GO!</div>
@@ -186,8 +186,9 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.game1 {
+.game2 {
   position: relative;
+  user-select: none;
   .head-box {
     display: flex;
     align-items: center;
