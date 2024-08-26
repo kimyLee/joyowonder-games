@@ -3,60 +3,22 @@
     <Panel ref="joyo"></Panel>
     <div class="head-box">
       <div class="icon-go" @click="handleGo">GO!</div>
-      <div>NO: 01</div>
+      <div>NO: 02</div>
     </div>
     <div class="game-container">
       <div class="game-box">
-        <div class="target" @click="handleAdd(3)">
-          <div class="board">
-            <div class="dice three">
-              <div class="dot1"></div>
-              <div class="dot2"></div>
-              <div class="dot3"></div>
-            </div>
-          </div>
-          <div class="stick"></div>
-        </div>
-        <div class="target" @click="handleAdd(1)">
-          <div class="board">
-            <div class="dice one"><div class="dot"></div></div>
-          </div>
-          <div class="stick"></div>
-        </div>
-        <div class="target" @click="handleAdd(2)">
-          <div class="board">
-            <div class="dice two">
-              <div class="dot1"></div>
-              <div class="dot2"></div>
-            </div>
-          </div>
-          <div class="stick"></div>
-        </div>
-
-        <div class="target" @click="handleAdd(4)">
-          <div class="board">
-            <div class="dice four">
-              <div class="dot1"></div>
-              <div class="dot2"></div>
-              <div class="dot3"></div>
-              <div class="dot4"></div>
-            </div>
-          </div>
-          <div class="stick"></div>
-        </div>
-        <div class="target" @click="handleAdd(2)">
-          <div class="board">
-            <div class="dice two">
-              <div class="dot1"></div>
-              <div class="dot2"></div>
-            </div>
-          </div>
-          <div class="stick"></div>
-        </div>
+        <div class="number number1" @click="handleAdd(1)">1</div>
+        <div class="number number2" @click="handleAdd(2)">2</div>
+        <div class="number number3" @click="handleAdd(3)">3</div>
+        <div class="number number4" @click="handleAdd(5)">5</div>
       </div>
     </div>
     <!-- 底部button -->
-    <button class="next-button" v-show="isGameWin">下一关</button>
+    <div class="controls">
+      <!-- <span class="button minus-sign">-</span> -->
+      <span class="button plus-sign" @click="handleAddOption()">+</span>
+    </div>
+    <button class="next-button" v-show="isGameWin" @click="nextGame">下一关</button>
 
     <!-- <div>
       <div class="operator-div" @click="handleClick">+</div>
@@ -74,6 +36,7 @@ import { useLightStore } from '@/stores/index'
 import { storeToRefs } from 'pinia'
 import { GlobalColor } from '@/stores/Color'
 import { playPreviewMusic } from '@/lib/Audio'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   props: {
@@ -83,6 +46,7 @@ export default defineComponent({
     Panel
   },
   setup(props) {
+    const router = useRouter()
     // store
     const store = useLightStore()
     const { count } = storeToRefs(store)
@@ -107,7 +71,9 @@ export default defineComponent({
       result: 0,
       rightCnt: 0,
       isGameWin: false,
-      isGameStart: false
+      isGameStart: false,
+      isWaitOption: false,
+      hasClickNum: [] as number[]
     })
 
     // 点击GO逻辑， 2s后出题
@@ -130,23 +96,40 @@ export default defineComponent({
     // 出题逻辑
     const handleQuestion = () => {
       state.sum = 0
+      state.hasClickNum = []
       playPreviewMusic('question01')
       let random = 0
       while (random === state.result || random === 0) {
-        random = Math.floor(Math.random() * 5) + 4
+        random = Math.floor(Math.random() * 6) + 3
       }
       // const random = Math.floor(Math.random() * 5) + 4
       setLightByNumber(random, GlobalColor.ORANGE)
       state.result = random
+      state.isWaitOption = false
     }
 
     // 点击选项（累加，一旦超出，失败）
+    const handleAddOption = () => {
+      playPreviewMusic('common01')
+      state.isWaitOption = false
+    }
     const handleAdd = (num: number) => {
       if (!state.isGameStart) {
         playPreviewMusic('common01')
         return
       }
+      if (state.isWaitOption) {
+        playPreviewMusic('click')
+        return
+      }
+      if (state.hasClickNum.indexOf(num) >= 0) {
+        playPreviewMusic('click')
+        return
+      }
+      state.hasClickNum.push(num)
+
       playPreviewMusic('common01')
+      state.isWaitOption = true
       state.sum = state.sum + num
       for (let i = 0; i < state.sum; i++) {
         setSingleLight(i, GlobalColor.GREEN)
@@ -157,7 +140,7 @@ export default defineComponent({
         playPreviewMusic('error')
       } else if (state.sum === state.result) {
         // 如果已经2次成功，游戏胜利，否则再来一题
-        if (state.rightCnt < 1) {
+        if (state.rightCnt < 0) {
           state.rightCnt++
           playPreviewMusic('mat1')
           setTimeout(() => {
@@ -172,6 +155,10 @@ export default defineComponent({
       }
     }
 
+    const nextGame = () => {
+      router.push({ name: 'game3' })
+    }
+
     onMounted(() => {
       setEnActive()
     })
@@ -179,7 +166,9 @@ export default defineComponent({
     return {
       ...toRefs(state),
       handleGo,
-      handleAdd
+      handleAdd,
+      handleAddOption,
+      nextGame
     }
   }
 })
@@ -223,29 +212,35 @@ export default defineComponent({
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
+    text-align: center;
+    width: 100%;
 
-    .target {
-      display: flex;
-      width: 33%;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    .number {
+      position: absolute;
+      font-size: 64px;
     }
 
-    .board {
-      width: 100px;
-      height: 60px;
-      background-color: brown;
-      border-radius: 5px;
-      text-align: center;
-      line-height: 60px;
-      font-size: 24px;
+    .number1 {
+      top: 10px;
+      left: 80px;
+      transform: translate(0px, 0px);
     }
 
-    .stick {
-      width: 20px;
-      height: 40px;
-      background-color: gray;
+    .number2 {
+      top: 10px;
+      left: 200px;
+      transform: translate(0px, 0px);
+    }
+
+    .number3 {
+      top: 160px;
+      left: 100px;
+      transform: translate(0px, 0px);
+    }
+    .number4 {
+      top: 160px;
+      left: 220px;
+      transform: translate(0px, 0px);
     }
   }
 
@@ -272,230 +267,34 @@ export default defineComponent({
   .greetings h3 {
     text-align: center;
   }
+}
 
-  // 骰子
-  .dice {
-    width: 50px;
-    height: 50px;
-    margin: 5px;
-    display: inline-block;
-    position: relative;
+.controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  .button {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid black;
+    border-radius: 5px;
   }
 
-  /* 面1 */
-  .dice.one .dot {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 20px;
-    left: 20px;
+  .minus-sign {
+    font-size: 64px;
+    transform: scale(1.2);
+    margin-right: 20px;
   }
 
-  /* 面2 */
-  .dice.two .dot1 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  .dice.two .dot2 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 30px;
-  }
-
-  /* 面3 */
-  .dice.three .dot1 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  .dice.three .dot2 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 30px;
-  }
-
-  .dice.three .dot3 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-  }
-
-  /* 面4 */
-  .dice.four .dot1 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  .dice.four .dot2 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 30px;
-  }
-
-  .dice.four .dot3 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 10px;
-  }
-
-  .dice.four .dot4 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 30px;
-  }
-
-  /* 面5 */
-  .dice.five .dot1 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  .dice.five .dot2 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 30px;
-  }
-
-  .dice.five .dot3 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 10px;
-  }
-
-  .dice.five .dot4 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 30px;
-  }
-
-  .dice.five .dot5 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-  }
-
-  /* 面6 */
-  .dice.six .dot1 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  .dice.six .dot2 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    left: 30px;
-  }
-
-  .dice.six .dot3 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 10px;
-  }
-
-  .dice.six .dot4 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 30px;
-    left: 30px;
-  }
-
-  .dice.six .dot5 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 20px;
-    left: 10px;
-  }
-
-  .dice.six .dot6 {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-    top: 20px;
-    left: 30px;
+  .plus-sign {
+    font-size: 64px;
+    margin-left: 20px;
   }
 }
 

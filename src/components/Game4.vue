@@ -1,21 +1,23 @@
 <template>
-  <div class="game3">
+  <div class="game4">
     <Panel ref="joyo"></Panel>
     <div class="head-box">
       <div class="icon-go" @click="handleGo">GO!</div>
-      <div>NO: 03<br /><span class="small">必须使用'-'号</span></div>
+      <div>NO: 04</div>
     </div>
     <div class="game-container">
       <div class="game-box">
         <div class="number number1" @click="handleAdd(1)">1</div>
         <div class="number number2" @click="handleAdd(2)">2</div>
-        <div class="number number3" @click="handleAdd(4)">4</div>
+        <div class="number number3" @click="handleAdd(3)">3</div>
+        <div class="number number4" @click="handleAdd(4)">4</div>
       </div>
     </div>
     <!-- 底部button -->
     <div class="controls">
-      <span class="button minus-sign" @click="handleAddOption('-')">-</span>
       <span class="button plus-sign" @click="handleAddOption('+')">+</span>
+      <span class="button plus-sign" @click="handleAddOption('-')">-</span>
+      <span class="button minus-sign" @click="handleAddOption('x')">x</span>
     </div>
     <button class="next-button" v-show="isGameWin" @click="nextGame">下一关</button>
 
@@ -72,9 +74,9 @@ export default defineComponent({
       isGameWin: false,
       isGameStart: false,
       isWaitOption: false,
-      isUseReduce: false,
+      hasClickNum: [] as number[],
       currentOption: '+',
-      hasClickNum: [] as number[]
+      isUseChen: false
     })
 
     // 点击GO逻辑， 2s后出题
@@ -96,15 +98,14 @@ export default defineComponent({
 
     // 出题逻辑
     const handleQuestion = () => {
-      const ans = [1, 2, 3, 5]
       state.sum = 0
       state.hasClickNum = []
       state.currentOption = '+'
-      state.isUseReduce = false
+      state.isUseChen = false
       playPreviewMusic('question01')
       let random = 0
       while (random === state.result || random === 0) {
-        random = ans[Math.floor(Math.random() * 4)]
+        random = Math.floor(Math.random() * 8) + 1
       }
       // const random = Math.floor(Math.random() * 5) + 4
       setLightByNumber(random, GlobalColor.ORANGE)
@@ -119,6 +120,7 @@ export default defineComponent({
 
       state.isWaitOption = false
     }
+
     const handleAdd = (num: number) => {
       if (!state.isGameStart) {
         playPreviewMusic('common01')
@@ -133,30 +135,27 @@ export default defineComponent({
         return
       }
       state.hasClickNum.push(num)
+
       playPreviewMusic('common01')
+
       state.isWaitOption = true
       if (state.currentOption === '+') {
         state.sum = state.sum + num
       } else if (state.currentOption === '-') {
         state.sum = state.sum - num
-        state.isUseReduce = true
+      } else if (state.currentOption === 'x') {
+        state.sum = state.sum * num
+        state.isUseChen = true
       }
 
       // 先点目标灯，再点结果灯
       handleShowLights()
 
-      // for (let i = 0; i < state.sum; i++) {
-      //   setSingleLight(i, GlobalColor.GREEN)
-      // }
-      // 这里数字过大不会失败，因为可以减法；考虑小于0要不要失败
-      if (state.sum < 0) {
+      if (state.sum !== state.result && state.hasClickNum.length === 4) {
         // 游戏失败
         setGameFail()
         playPreviewMusic('error')
-      } else if (state.sum !== state.result && state.hasClickNum.length === 3) {
-        setGameFail()
-        playPreviewMusic('error')
-      } else if (state.sum === state.result && state.isUseReduce) {
+      } else if (state.sum === state.result && state.isUseChen) {
         // 如果已经2次成功，游戏胜利，否则再来一题
         if (state.rightCnt < 0) {
           state.rightCnt++
@@ -185,7 +184,7 @@ export default defineComponent({
     }
 
     const nextGame = () => {
-      router.push({ name: 'game4' })
+      router.push({ name: 'game5' })
     }
 
     onMounted(() => {
@@ -204,7 +203,7 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.game3 {
+.game4 {
   position: relative;
   user-select: none;
   .head-box {
@@ -224,9 +223,6 @@ export default defineComponent({
       border-radius: 50%;
       background-color: burlywood;
       margin-right: 10px;
-    }
-    .small {
-      font-size: 12px;
     }
   }
   .game-container {
@@ -253,18 +249,23 @@ export default defineComponent({
     }
 
     .number1 {
-      top: 0;
+      top: 10px;
       left: 80px;
       transform: translate(0px, 0px);
     }
 
     .number2 {
-      top: 80px;
-      left: 150px;
+      top: 10px;
+      left: 200px;
       transform: translate(0px, 0px);
     }
 
     .number3 {
+      top: 160px;
+      left: 100px;
+      transform: translate(0px, 0px);
+    }
+    .number4 {
       top: 160px;
       left: 220px;
       transform: translate(0px, 0px);
@@ -316,12 +317,12 @@ export default defineComponent({
   .minus-sign {
     font-size: 64px;
     transform: scale(1.2);
-    margin-right: 20px;
+    margin-left: 20px;
   }
 
   .plus-sign {
     font-size: 64px;
-    margin-left: 20px;
+    margin-left: 10px;
   }
 }
 

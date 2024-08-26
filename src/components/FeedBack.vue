@@ -7,9 +7,8 @@ defineProps<{
 <template>
   <div class="feedback">
     <h1>感谢您的体验！</h1>
-    <p>请提供您的重要反馈。</p>
+    <p>请提供您的重要反馈。 <a href="https://www.wjx.cn/vm/eLhKyYD.aspx# ">点击填写</a></p>
     <img src="@/assets/code.png" alt="二维码" />
-    <a href="your_feedback_link">填写反馈</a>
   </div>
 </template>
 
@@ -28,7 +27,7 @@ defineProps<{
     text-align: center;
   }
   img {
-    width: 70%;
+    width: 50%;
   }
 }
 </style>

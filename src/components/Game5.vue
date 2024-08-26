@@ -3,19 +3,22 @@
     <Panel ref="joyo"></Panel>
     <div class="head-box">
       <div class="icon-go" @click="handleGo">GO!</div>
-      <div>NO: 05<br /><span class="small">必须使用'-'号</span></div>
+      <div>NO: 05</div>
     </div>
     <div class="game-container">
       <div class="game-box">
-        <div class="number number1" @click="handleAdd(1)">1</div>
-        <div class="number number2" @click="handleAdd(2)">2</div>
-        <div class="number number3" @click="handleAdd(4)">4</div>
+        <div class="number number1" @click="handleAdd(2)">2</div>
+        <div class="number number2" @click="handleAdd(3)">3</div>
+        <div class="number number3" @click="handleAdd(8)">8</div>
+        <div class="number number4" @click="handleAdd(9)">9</div>
       </div>
     </div>
     <!-- 底部button -->
     <div class="controls">
-      <span class="button minus-sign" @click="handleAddOption('-')">-</span>
       <span class="button plus-sign" @click="handleAddOption('+')">+</span>
+      <span class="button plus-sign" @click="handleAddOption('-')">-</span>
+      <span class="button plus-sign" @click="handleAddOption('x')">x</span>
+      <span class="button minus-sign" @click="handleAddOption('÷')">÷</span>
     </div>
     <button class="next-button" v-show="isGameWin" @click="nextGame">下一关</button>
 
@@ -72,8 +75,9 @@ export default defineComponent({
       isGameWin: false,
       isGameStart: false,
       isWaitOption: false,
-      isUseReduce: false,
-      currentOption: '+'
+      hasClickNum: [] as number[],
+      currentOption: '+',
+      isUseChu: false
     })
 
     // 点击GO逻辑， 2s后出题
@@ -95,14 +99,14 @@ export default defineComponent({
 
     // 出题逻辑
     const handleQuestion = () => {
-      const ans = [1, 2, 3, 5]
       state.sum = 0
+      state.hasClickNum = []
       state.currentOption = '+'
-      state.isUseReduce = false
+      state.isUseChu = false
       playPreviewMusic('question01')
       let random = 0
       while (random === state.result || random === 0) {
-        random = ans[Math.floor(Math.random() * 4)]
+        random = Math.floor(Math.random() * 8) + 1
       }
       // const random = Math.floor(Math.random() * 5) + 4
       setLightByNumber(random, GlobalColor.ORANGE)
@@ -117,6 +121,11 @@ export default defineComponent({
 
       state.isWaitOption = false
     }
+
+    function isDivisible(a: number, b: number) {
+      return a % b === 0
+    }
+
     const handleAdd = (num: number) => {
       if (!state.isGameStart) {
         playPreviewMusic('common01')
@@ -126,29 +135,41 @@ export default defineComponent({
         playPreviewMusic('click')
         return
       }
+      if (state.hasClickNum.indexOf(num) >= 0) {
+        playPreviewMusic('click')
+        return
+      }
+      state.hasClickNum.push(num)
+
       playPreviewMusic('common01')
+
       state.isWaitOption = true
       if (state.currentOption === '+') {
         state.sum = state.sum + num
       } else if (state.currentOption === '-') {
         state.sum = state.sum - num
-        state.isUseReduce = true
+      } else if (state.currentOption === 'x') {
+        state.sum = state.sum * num
+      } else if (state.currentOption === '÷') {
+        if (isDivisible(state.sum, num)) {
+          state.sum = Math.floor(state.sum / num)
+          state.isUseChu = true
+        } else {
+          setGameFail()
+          playPreviewMusic('error')
+        }
       }
 
       // 先点目标灯，再点结果灯
       handleShowLights()
 
-      // for (let i = 0; i < state.sum; i++) {
-      //   setSingleLight(i, GlobalColor.GREEN)
-      // }
-      // 这里数字过大不会失败，因为可以减法；考虑小于0要不要失败
-      if (state.sum < 0) {
+      if (state.sum !== state.result && state.hasClickNum.length === 4) {
         // 游戏失败
         setGameFail()
         playPreviewMusic('error')
-      } else if (state.sum === state.result && state.isUseReduce) {
+      } else if (state.sum === state.result && state.isUseChu) {
         // 如果已经2次成功，游戏胜利，否则再来一题
-        if (state.rightCnt < 1) {
+        if (state.rightCnt < 0) {
           state.rightCnt++
           playPreviewMusic('mat1')
           setTimeout(() => {
@@ -215,9 +236,6 @@ export default defineComponent({
       background-color: burlywood;
       margin-right: 10px;
     }
-    .small {
-      font-size: 12px;
-    }
   }
   .game-container {
     display: flex;
@@ -243,18 +261,23 @@ export default defineComponent({
     }
 
     .number1 {
-      top: 0;
+      top: 10px;
       left: 80px;
       transform: translate(0px, 0px);
     }
 
     .number2 {
-      top: 80px;
-      left: 150px;
+      top: 10px;
+      left: 200px;
       transform: translate(0px, 0px);
     }
 
     .number3 {
+      top: 160px;
+      left: 100px;
+      transform: translate(0px, 0px);
+    }
+    .number4 {
       top: 160px;
       left: 220px;
       transform: translate(0px, 0px);
@@ -294,8 +317,8 @@ export default defineComponent({
   display: flex;
   align-items: center;
   .button {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -306,12 +329,12 @@ export default defineComponent({
   .minus-sign {
     font-size: 64px;
     transform: scale(1.2);
-    margin-right: 20px;
+    margin-left: 20px;
   }
 
   .plus-sign {
     font-size: 64px;
-    margin-left: 20px;
+    margin-left: 10px;
   }
 }
 

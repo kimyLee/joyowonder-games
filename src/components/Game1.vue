@@ -7,7 +7,7 @@
     </div>
     <div class="game-container">
       <div class="game-box">
-        <div class="target" @click="handleAdd(3)">
+        <div class="target" @click="handleAdd(3, 1)">
           <div class="board">
             <div class="dice three">
               <div class="dot1"></div>
@@ -17,23 +17,16 @@
           </div>
           <div class="stick"></div>
         </div>
-        <div class="target" @click="handleAdd(1)">
+        <div class="target" @click="handleAdd(2, 2)">
           <div class="board">
-            <div class="dice one"><div class="dot"></div></div>
-          </div>
-          <div class="stick"></div>
-        </div>
-        <div class="target" @click="handleAdd(2)">
-          <div class="board">
-            <div class="dice two">
+            <div class="dice two1">
               <div class="dot1"></div>
               <div class="dot2"></div>
             </div>
           </div>
           <div class="stick"></div>
         </div>
-
-        <div class="target" @click="handleAdd(4)">
+        <div class="target" @click="handleAdd(4, 3)">
           <div class="board">
             <div class="dice four">
               <div class="dot1"></div>
@@ -44,7 +37,16 @@
           </div>
           <div class="stick"></div>
         </div>
-        <div class="target" @click="handleAdd(2)">
+
+        <div class="target" @click="handleAdd(1, 4)">
+          <div class="board">
+            <div class="dice one">
+              <div class="dot"></div>
+            </div>
+          </div>
+          <div class="stick"></div>
+        </div>
+        <div class="target" @click="handleAdd(2, 5)">
           <div class="board">
             <div class="dice two">
               <div class="dot1"></div>
@@ -109,7 +111,8 @@ export default defineComponent({
       result: 0,
       rightCnt: 0,
       isGameWin: false,
-      isGameStart: false
+      isGameStart: false,
+      hasClickNum: [] as number[]
     })
 
     // 点击GO逻辑， 2s后出题
@@ -132,6 +135,7 @@ export default defineComponent({
     // 出题逻辑
     const handleQuestion = () => {
       state.sum = 0
+      state.hasClickNum = []
       playPreviewMusic('question01')
       let random = 0
       while (random === state.result || random === 0) {
@@ -143,11 +147,16 @@ export default defineComponent({
     }
 
     // 点击选项（累加，一旦超出，失败）
-    const handleAdd = (num: number) => {
+    const handleAdd = (num: number, index: number) => {
       if (!state.isGameStart) {
         playPreviewMusic('common01')
         return
       }
+      if (state.hasClickNum.indexOf(index) >= 0) {
+        playPreviewMusic('click')
+        return
+      }
+      state.hasClickNum.push(index)
       playPreviewMusic('common01')
       state.sum = state.sum + num
       for (let i = 0; i < state.sum; i++) {
@@ -159,7 +168,7 @@ export default defineComponent({
         playPreviewMusic('error')
       } else if (state.sum === state.result) {
         // 如果已经2次成功，游戏胜利，否则再来一题
-        if (state.rightCnt < 1) {
+        if (state.rightCnt < 2) {
           state.rightCnt++
           playPreviewMusic('mat1')
           setTimeout(() => {
@@ -175,7 +184,7 @@ export default defineComponent({
     }
 
     const nextGame = () => {
-      router.push({ name: 'game3' })
+      router.push({ name: 'game2' })
     }
 
     onMounted(() => {
@@ -293,7 +302,7 @@ export default defineComponent({
   .dice.one .dot {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 20px;
@@ -304,48 +313,68 @@ export default defineComponent({
   .dice.two .dot1 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 10px;
-    left: 10px;
+    left: 30px;
   }
 
   .dice.two .dot2 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 30px;
-    left: 30px;
+    left: 10px;
+  }
+
+  .dice.two1 .dot1 {
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    left: 20px;
+  }
+
+  .dice.two1 .dot2 {
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 30px;
+    left: 20px;
   }
 
   /* 面3 */
   .dice.three .dot1 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 20px;
+    left: 5px;
   }
 
   .dice.three .dot2 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
-    top: 30px;
-    left: 30px;
+    top: 20px;
+    left: 35px;
   }
 
   .dice.three .dot3 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 20px;
@@ -356,48 +385,48 @@ export default defineComponent({
   .dice.four .dot1 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 15px;
+    left: 5px;
   }
 
   .dice.four .dot2 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
-    top: 10px;
-    left: 30px;
+    top: 15px;
+    left: 20px;
   }
 
   .dice.four .dot3 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
-    top: 30px;
-    left: 10px;
+    top: 15px;
+    left: 35px;
   }
 
   .dice.four .dot4 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 30px;
-    left: 30px;
+    left: 20px;
   }
 
   /* 面5 */
   .dice.five .dot1 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 10px;
@@ -407,7 +436,7 @@ export default defineComponent({
   .dice.five .dot2 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 10px;
@@ -417,7 +446,7 @@ export default defineComponent({
   .dice.five .dot3 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 30px;
@@ -427,7 +456,7 @@ export default defineComponent({
   .dice.five .dot4 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 30px;
@@ -437,7 +466,7 @@ export default defineComponent({
   .dice.five .dot5 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 20px;
@@ -448,7 +477,7 @@ export default defineComponent({
   .dice.six .dot1 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 10px;
@@ -458,7 +487,7 @@ export default defineComponent({
   .dice.six .dot2 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 10px;
@@ -468,7 +497,7 @@ export default defineComponent({
   .dice.six .dot3 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 30px;
@@ -478,7 +507,7 @@ export default defineComponent({
   .dice.six .dot4 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 30px;
@@ -488,7 +517,7 @@ export default defineComponent({
   .dice.six .dot5 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 20px;
@@ -498,7 +527,7 @@ export default defineComponent({
   .dice.six .dot6 {
     width: 10px;
     height: 10px;
-    background-color: #ccc;
+    background-color: #fff;
     border-radius: 50%;
     position: absolute;
     top: 20px;
