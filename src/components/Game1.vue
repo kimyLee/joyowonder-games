@@ -58,6 +58,7 @@
       </div>
     </div>
     <!-- 底部button -->
+    <p class="center-text">合并得出目标灯数</p>
     <button class="next-button" v-show="isGameWin" @click="nextGame">下一关</button>
 
     <!-- <div>

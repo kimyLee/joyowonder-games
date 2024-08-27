@@ -5,6 +5,10 @@
   src: url('./Atma-Bold.ttf');
 }
 
+.center-text {
+  text-align: center;
+}
+
 #app {
   max-width: 1280px;
   margin: 0 auto;

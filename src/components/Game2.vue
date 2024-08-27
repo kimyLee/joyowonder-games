@@ -12,8 +12,11 @@
         <div class="number number3" @click="handleAdd(3)">3</div>
         <div class="number number4" @click="handleAdd(5)">5</div>
       </div>
+      <p class="game-text">计算得出目标灯数</p>
     </div>
+
     <!-- 底部button -->
+
     <div class="controls">
       <!-- <span class="button minus-sign">-</span> -->
       <span class="button plus-sign" @click="handleAddOption()">+</span>
@@ -202,6 +205,13 @@ export default defineComponent({
     align-items: center;
     height: 400px;
     position: relative;
+    .game-text {
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
+      left: 0;
+      text-align: center;
+    }
   }
   .game-box {
     // justify-content: space-between;
