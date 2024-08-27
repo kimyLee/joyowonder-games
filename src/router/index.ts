@@ -6,14 +6,15 @@ import Game3 from '../components/Game3.vue'
 import Game4 from '../components/Game4.vue'
 import Game5 from '../components/Game5.vue'
 import FeedBack from '../components/FeedBack.vue'
+import Start from '../components/start.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: 'start',
+      component: Start
     },
     {
       path: '/game1',
