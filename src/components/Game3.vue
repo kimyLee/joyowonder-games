@@ -3,7 +3,7 @@
     <Panel ref="joyo"></Panel>
     <div class="head-box">
       <div class="icon-go" @click="handleGo">GO!</div>
-      <div>NO: 03<br /><span class="small">必须使用'-'号</span></div>
+      <div>NO: 03<br /><span class="small">尽量使用'-'号</span></div>
     </div>
     <div class="game-container">
       <div class="game-box">
@@ -156,7 +156,7 @@ export default defineComponent({
       } else if (state.sum !== state.result && state.hasClickNum.length === 3) {
         setGameFail()
         playPreviewMusic('error')
-      } else if (state.sum === state.result && state.isUseReduce) {
+      } else if (state.sum === state.result) {
         // 如果已经2次成功，游戏胜利，否则再来一题
         if (state.rightCnt < 0) {
           state.rightCnt++
