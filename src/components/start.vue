@@ -7,7 +7,7 @@ export default defineComponent({
     const router = useRouter()
     // store
     const nextGame = () => {
-      router.push({ name: 'game1' })
+      router.push({ name: 'game2' })
     }
 
     return {
